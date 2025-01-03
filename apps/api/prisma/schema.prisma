@@ -58,6 +58,8 @@ model RSVP {
   eventId String
   event   Event  @relation(fields: [eventId], references: [id])
   status  RSVPStatus
+
+  @@unique([userId,eventId])
 }
 
 model Tag {

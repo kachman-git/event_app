@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { RsvpService } from './rsvp.service';
-import { RsvpController } from './rsvp.controller';
+import { RSVPService } from './rsvp.service';
+import { RSVPController } from './rsvp.controller';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Module({
-  controllers: [RsvpController],
-  providers: [RsvpService],
+  controllers: [RSVPController],
+  providers: [RSVPService, PrismaService],
 })
 export class RsvpModule {}
