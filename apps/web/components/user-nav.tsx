@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,38 +13,38 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { authApi, userApi, profileApi } from "@/api/api"
-import { User, Profile } from "@/types/api"
+} from "@/components/ui/dropdown-menu";
+import { authApi, userApi, profileApi } from "@/lib/api";
+import { User, Profile } from "@/types";
 
 export function UserNav() {
-  const router = useRouter()
-  const [user, setUser] = useState<User | null>(null)
-  const [profile, setProfile] = useState<Profile | null>(null)
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userData = await userApi.getMe()
-        setUser(userData)
-        const profileData = await profileApi.getMyProfile()
-        setProfile(profileData)
+        const userData = await userApi.getMe();
+        setUser(userData);
+        const profileData = await profileApi.getMyProfile();
+        setProfile(profileData);
       } catch (error) {
-        console.error("Failed to fetch user data:", error)
+        console.error("Failed to fetch user data:", error);
       }
-    }
+    };
 
     if (localStorage.getItem("access_token")) {
-      fetchData()
+      fetchData();
     }
-  }, [])
+  }, []);
 
   const handleLogout = () => {
-    authApi.logout()
-    setUser(null)
-    setProfile(null)
-    router.push("/signin")
-  }
+    authApi.logout();
+    setUser(null);
+    setProfile(null);
+    router.push("/signin");
+  };
 
   if (!user) {
     return (
@@ -56,7 +56,7 @@ export function UserNav() {
           <Button>Sign Up</Button>
         </Link>
       </div>
-    )
+    );
   }
 
   return (
@@ -81,20 +81,16 @@ export function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <Link href="/profile">
-            <DropdownMenuItem>
-              Profile
-            </DropdownMenuItem>
+            <DropdownMenuItem>Profile</DropdownMenuItem>
           </Link>
-          <DropdownMenuItem>
-            Settings
-          </DropdownMenuItem>
+          <Link href="/settings">
+            <DropdownMenuItem>Settings</DropdownMenuItem>
+          </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout}>
-          Log out
-        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }
 
