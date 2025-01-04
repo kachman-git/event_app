@@ -1,35 +1,42 @@
-'use client'
+"use client";
 
-import { useRouter } from 'next/navigation'
-import { EventForm } from '@/components/event-form'
-import { eventApi } from '@/lib/api'
-import { CreateEventDto } from '@/types'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useRouter } from "next/navigation";
+import { EventForm } from "@/components/event-form";
+import { eventApi } from "@/lib/api";
+import { CreateEventDto, UpdateEventDto } from "@/types";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function CreateEventPage() {
-  const router = useRouter()
+  const router = useRouter();
 
-  const handleSubmit = async (data: CreateEventDto) => {
+  const handleSubmit = async (data: CreateEventDto | UpdateEventDto) => {
     try {
-      await eventApi.create(data)
-      router.push('/my-events')
+      await eventApi.create(data as CreateEventDto);
+      router.push("/my-events");
     } catch (error) {
-      console.error('Failed to create event:', error)
+      console.error("Failed to create event:", error);
     }
-  }
+  };
 
   return (
     <div className="container mx-auto py-10">
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>Create New Event</CardTitle>
-          <CardDescription>Fill in the details to create a new event.</CardDescription>
+          <CardDescription>
+            Fill in the details to create a new event.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <EventForm onSubmit={handleSubmit} />
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
-

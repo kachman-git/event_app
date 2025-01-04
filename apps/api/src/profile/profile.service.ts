@@ -82,7 +82,7 @@ export class ProfileService {
       where: { userId },
     });
     if (!profile) {
-      throw new NotFoundException('Profile not found');
+      throw new ForbiddenException('Profile not found');
     }
     return this.prisma.profile.update({
       where: { userId },

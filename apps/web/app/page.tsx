@@ -1,9 +1,9 @@
-import Link from 'next/link'
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-100 to-gray-200">
+    <div className="flex flex-col items-center justify-center min-h-screen ">
       <h1 className="text-4xl font-bold mb-8">Welcome to Event Management</h1>
       <div className="space-x-4">
         <Link href="/signin">
@@ -14,6 +14,5 @@ export default function Home() {
         </Link>
       </div>
     </div>
-  )
+  );
 }
-

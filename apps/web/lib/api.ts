@@ -18,14 +18,14 @@ import {
 } from "@/types";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000/api";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3333";
 
 async function fetchWithAuth(url: string, options: RequestInit = {}) {
-  const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem("token");
   const headers = {
     "Content-Type": "application/json",
     ...options.headers,
-    Authorization: token ? `Bearer ${token}` : "",
+    Authorization: `Bearer ${token}`,
   };
 
   const response = await fetch(`${API_BASE_URL}${url}`, {
@@ -93,7 +93,7 @@ export const profileApi = {
 
 // Auth API
 export const setAuthToken = (token: string) => {
-  localStorage.setItem("access_token", token);
+  localStorage.setItem("token", token);
 };
 
 export const authApi = {
@@ -122,7 +122,7 @@ export const authApi = {
     return result;
   },
   logout: () => {
-    localStorage.removeItem("access_token");
+    localStorage.removeItem("token");
   },
 };
 

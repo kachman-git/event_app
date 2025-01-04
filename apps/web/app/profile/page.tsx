@@ -1,43 +1,51 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { userApi, profileApi } from '@/lib/api'
-import { User, Profile } from '@/types'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Loader2, Mail, Phone, MapPin, Calendar } from 'lucide-react'
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { userApi, profileApi } from "@/lib/api";
+import { User, Profile } from "@/types";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Loader2, Mail, Phone, MapPin, Calendar } from "lucide-react";
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<User | null>(null)
-  const [profile, setProfile] = useState<Profile | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userData = await userApi.getMe()
-        setUser(userData)
-        const profileData = await profileApi.getMyProfile()
-        setProfile(profileData)
+        const userData = await userApi.getMe();
+        setUser(userData);
+        const profileData = await profileApi.getMyProfile();
+        setProfile(profileData);
       } catch (err) {
-        setError('Failed to fetch user data')
+        setError("Failed to fetch user data");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
+    console.log({ user, profile });
 
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -52,7 +60,7 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
@@ -85,7 +93,9 @@ export default function ProfilePage() {
           )}
           <div className="flex items-center space-x-2">
             <Calendar className="h-5 w-5 text-gray-500" />
-            <span>Joined {new Date(user?.createdAt || '').toLocaleDateString()}</span>
+            <span>
+              Joined {new Date(user?.createdAt || "").toLocaleDateString()}
+            </span>
           </div>
         </CardContent>
         <CardFooter className="flex justify-center">
@@ -95,6 +105,5 @@ export default function ProfilePage() {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
-
