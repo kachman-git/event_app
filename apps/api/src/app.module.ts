@@ -7,8 +7,15 @@ import { EventModule } from './event/event.module';
 import { RsvpModule } from './rsvp/rsvp.module';
 import { TagsModule } from './tags/tags.module';
 import { PrismaModule } from './prisma/prisma.module';
+
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),

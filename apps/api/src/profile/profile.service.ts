@@ -76,4 +76,17 @@ export class ProfileService {
       },
     });
   }
+
+  async updateAvatar(userId: string, avatarUrl: string) {
+    const profile = await this.prisma.profile.findUnique({
+      where: { userId },
+    });
+    if (!profile) {
+      throw new NotFoundException('Profile not found');
+    }
+    return this.prisma.profile.update({
+      where: { userId },
+      data: { avatarUrl },
+    });
+  }
 }
