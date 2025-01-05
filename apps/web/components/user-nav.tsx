@@ -21,11 +21,10 @@ export function UserNav() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [token, setToken] = useState<string | null>(
-    localStorage.getItem("token")
-  );
+  const [token, setToken] = useState<string | null>();
 
   useEffect(() => {
+    setToken(localStorage.getItem("token"));
     const fetchData = async () => {
       try {
         const userData = await userApi.getMe();
