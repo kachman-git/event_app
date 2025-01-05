@@ -21,6 +21,9 @@ export function UserNav() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [token, setToken] = useState<string | null>(
+    localStorage.getItem("token")
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,10 +37,10 @@ export function UserNav() {
       }
     };
 
-    if (localStorage.getItem("access_token")) {
+    if (token) {
       fetchData();
     }
-  }, []);
+  }, [token]);
 
   const handleLogout = () => {
     authApi.logout();

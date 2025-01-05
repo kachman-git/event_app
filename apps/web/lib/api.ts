@@ -22,11 +22,19 @@ const API_BASE_URL =
 
 async function fetchWithAuth(url: string, options: RequestInit = {}) {
   const token = localStorage.getItem("token");
-  const headers = {
+
+  const defaultHeaders: Record<string, string> = {
     "Content-Type": "application/json",
-    ...options.headers,
-    Authorization: `Bearer ${token}`,
   };
+
+  const headers: Record<string, string> = {
+    ...defaultHeaders,
+    ...(options.headers as Record<string, string>),
+  };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
 
   const response = await fetch(`${API_BASE_URL}${url}`, {
     ...options,
@@ -34,10 +42,18 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
   });
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    const errorText = await response.text();
+    throw new Error(
+      `HTTP error! status: ${response.status}, message: ${errorText}`
+    );
   }
 
-  return response.json();
+  const contentType = response.headers.get("Content-Type");
+  if (contentType && contentType.includes("application/json")) {
+    return response.json();
+  }
+
+  return response.text();
 }
 
 // Event API
