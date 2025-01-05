@@ -1,91 +1,120 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { UserForm } from '@/components/user-form'
-import { ProfileForm } from '@/components/profile-form'
-import { userApi, profileApi } from '@/lib/api'
-import { User, Profile, EditUserDto, UpdateProfileDto } from '@/types'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Loader2 } from 'lucide-react'
+import { useState, useEffect } from "react";
+import { UserForm } from "@/components/user-form";
+import { ProfileForm } from "@/components/profile-form";
+import { userApi, profileApi } from "@/lib/api";
+import { User, Profile, EditUserDto, UpdateProfileDto } from "@/types";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Loader2, Moon, Sun } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useTheme } from "next-themes";
+import { Button } from "@/components/ui/button";
 
 export default function SettingsPage() {
-  const [user, setUser] = useState<User | null>(null)
-  const [profile, setProfile] = useState<Profile | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userData = await userApi.getMe()
-        setUser(userData)
-        const profileData = await profileApi.getMyProfile()
-        setProfile(profileData)
+        const userData = await userApi.getMe();
+        setUser(userData);
+        const profileData = await profileApi.getMyProfile();
+        setProfile(profileData);
       } catch (err) {
-        setError('Failed to fetch user data')
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to fetch user data",
+        });
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchData()
-  }, [])
+    fetchData();
+  }, [toast]);
 
   const handleUserUpdate = async (data: EditUserDto) => {
     try {
-      const updatedUser = await userApi.edit(data)
-      setUser(updatedUser)
-      setSuccessMessage('User information updated successfully')
+      const updatedUser = await userApi.edit(data);
+      setUser(updatedUser);
+      toast({
+        title: "Success",
+        description: "User information updated successfully",
+      });
     } catch (err) {
-      setError('Failed to update user information')
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update user information",
+      });
     }
-  }
+  };
 
   const handleProfileUpdate = async (data: UpdateProfileDto) => {
     try {
       if (profile?.id) {
-        const updatedProfile = await profileApi.update(profile.id, data)
-        setProfile(updatedProfile)
-        setSuccessMessage('Profile updated successfully')
+        const updatedProfile = await profileApi.update(profile.id, data);
+        setProfile(updatedProfile);
+        toast({
+          title: "Success",
+          description: "Profile updated successfully",
+        });
       } else {
-        const newProfile = await profileApi.create(data)
-        setProfile(newProfile)
-        setSuccessMessage('Profile created successfully')
+        const newProfile = await profileApi.create(data);
+        setProfile(newProfile);
+        toast({
+          title: "Success",
+          description: "Profile created successfully",
+        });
       }
     } catch (err) {
-      setError('Failed to update profile')
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update profile",
+      });
     }
-  }
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light");
+  };
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <Alert variant="destructive" className="max-w-md mx-auto mt-8">
-        <AlertTitle>Error</AlertTitle>
-        <AlertDescription>{error}</AlertDescription>
-      </Alert>
-    )
+    );
   }
 
   return (
     <div className="container mx-auto py-10">
       <h1 className="text-3xl font-bold mb-8">Settings</h1>
-      {successMessage && (
-        <Alert className="mb-8">
-          <AlertTitle>Success</AlertTitle>
-          <AlertDescription>{successMessage}</AlertDescription>
-        </Alert>
-      )}
+      <div className="mb-8">
+        <Button onClick={toggleTheme} variant="outline">
+          {theme === "light" ? (
+            <Moon className="h-4 w-4" />
+          ) : (
+            <Sun className="h-4 w-4" />
+          )}
+          {theme === "light" ? "Dark" : "Light"} Mode
+        </Button>
+      </div>
       <Tabs defaultValue="user">
         <TabsList className="mb-4">
           <TabsTrigger value="user">User Information</TabsTrigger>
@@ -95,7 +124,9 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle>User Information</CardTitle>
-              <CardDescription>Update your account details here.</CardDescription>
+              <CardDescription>
+                Update your account details here.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {user && <UserForm user={user} onSubmit={handleUserUpdate} />}
@@ -106,7 +137,9 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Profile</CardTitle>
-              <CardDescription>Manage your public profile information.</CardDescription>
+              <CardDescription>
+                Manage your public profile information.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <ProfileForm profile={profile} onSubmit={handleProfileUpdate} />
@@ -115,6 +148,5 @@ export default function SettingsPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
-
