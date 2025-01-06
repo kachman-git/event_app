@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { userApi } from '@/lib/api'
 import { EditUserDto, User } from '@/types'
+import { useToast } from "@/hooks/use-toast"
 
 const userSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -20,6 +21,7 @@ interface UserFormProps {
 
 export function UserForm({ user, onSubmit }: UserFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const { toast } = useToast()
 
   const form = useForm<z.infer<typeof userSchema>>({
     resolver: zodResolver(userSchema),
@@ -33,8 +35,16 @@ export function UserForm({ user, onSubmit }: UserFormProps) {
     setIsSubmitting(true)
     try {
       await onSubmit(data)
+      toast({
+        title: "Success",
+        description: "User information updated successfully",
+      })
     } catch (error) {
-      console.error('Failed to update user:', error)
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update user information",
+      })
     } finally {
       setIsSubmitting(false)
     }

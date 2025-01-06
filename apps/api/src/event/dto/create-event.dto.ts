@@ -1,4 +1,4 @@
-import { IsDateString, IsNotEmpty, IsString } from 'class-validator';
+import { IsISO8601, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateEventDto {
   @IsNotEmpty()
@@ -14,11 +14,5 @@ export class CreateEventDto {
   location: string;
 
   @IsNotEmpty()
-  @IsDateString(
-    {},
-    {
-      message: 'Date must be a valid ISO 8601 date string.',
-    },
-  )
   date: string;
 }

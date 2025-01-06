@@ -14,7 +14,12 @@ export function Countdown({ targetDate }: CountdownProps) {
 
   function calculateTimeLeft() {
     const difference = +targetDate - +new Date();
-    let timeLeft = {};
+    let timeLeft: {
+      days?: number;
+      hours?: number;
+      minutes?: number;
+      seconds?: number;
+    } = {};
 
     if (difference > 0) {
       timeLeft = {

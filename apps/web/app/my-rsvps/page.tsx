@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { toast } from "@/components/ui/use-toast";
 
 export default function MyRSVPsPage() {
   const [rsvps, setRSVPs] = useState<RSVP[]>([]);
@@ -35,6 +36,11 @@ export default function MyRSVPsPage() {
         }
         setEvents(eventDetails);
       } catch (err) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to fetch RSVPs. Please try again.",
+        });
         setError("Failed to fetch RSVPs");
       } finally {
         setLoading(false);
@@ -42,7 +48,7 @@ export default function MyRSVPsPage() {
     };
 
     fetchRSVPs();
-  }, []);
+  }, [toast]);
 
   if (loading) {
     return (

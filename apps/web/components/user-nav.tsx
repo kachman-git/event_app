@@ -16,15 +16,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { authApi, userApi, profileApi } from "@/lib/api";
 import { User, Profile } from "@/types";
+import { toast } from "@/components/ui/use-toast";
 
 export function UserNav() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [token, setToken] = useState<string | null>();
 
   useEffect(() => {
-    setToken(localStorage.getItem("token"));
     const fetchData = async () => {
       try {
         const userData = await userApi.getMe();
@@ -33,18 +32,27 @@ export function UserNav() {
         setProfile(profileData);
       } catch (error) {
         console.error("Failed to fetch user data:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to fetch user data. Please try again.",
+        });
       }
     };
 
-    if (token) {
+    if (localStorage.getItem("token")) {
       fetchData();
     }
-  }, [token]);
+  }, [toast]);
 
   const handleLogout = () => {
     authApi.logout();
     setUser(null);
     setProfile(null);
+    toast({
+      title: "Success",
+      description: "Logged out successfully",
+    });
     router.push("/signin");
   };
 

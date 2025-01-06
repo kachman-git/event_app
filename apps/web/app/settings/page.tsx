@@ -9,15 +9,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Loader2, Moon, Sun } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
+import { BackButton } from "@/components/back-button";
 
 export default function SettingsPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -104,6 +104,7 @@ export default function SettingsPage() {
 
   return (
     <div className="container mx-auto py-10">
+      <BackButton />
       <h1 className="text-3xl font-bold mb-8">Settings</h1>
       <div className="mb-8">
         <Button onClick={toggleTheme} variant="outline">

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/custom-button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/form";
 import { eventApi } from "@/lib/api";
 import { CreateEventDto, UpdateEventDto } from "@/types";
+import { useToast } from "@/hooks/use-toast";
 
 const eventSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -31,6 +32,7 @@ interface EventFormProps {
 
 export function EventForm({ event, onSubmit }: EventFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
@@ -46,8 +48,20 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
     setIsSubmitting(true);
     try {
       await onSubmit(data);
+      toast({
+        title: "Success",
+        description: event?.id
+          ? "Event updated successfully"
+          : "Event created successfully",
+      });
     } catch (error) {
-      console.error("Failed to submit event:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: event?.id
+          ? "Failed to update event"
+          : "Failed to create event",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -108,12 +122,8 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting
-            ? "Submitting..."
-            : event?.id
-              ? "Update Event"
-              : "Create Event"}
+        <Button type="submit" loading={isSubmitting}>
+          {event?.id ? "Update Event" : "Create Event"}
         </Button>
       </form>
     </Form>

@@ -5,15 +5,19 @@ import { Event } from "@/types";
 import { eventApi } from "@/lib/api";
 import { EventsTable } from "@/components/events-table";
 import { UserNav } from "@/components/user-nav";
-import { Button } from "@/components/ui/button";
-import { ArrowUpDown } from "lucide-react";
+import { Button } from "@/components/ui/custom-button";
+import { ArrowUpDown, Plus, Calendar } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import Link from "next/link";
 
 export default function EventsPage() {
+  const router = useRouter();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -21,14 +25,18 @@ export default function EventsPage() {
         const fetchedEvents = await eventApi.getAll();
         setEvents(fetchedEvents);
       } catch (err) {
-        setError("Failed to fetch events");
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to fetch events. Please try again later.",
+        });
       } finally {
         setLoading(false);
       }
     };
-    console.log(events);
+
     fetchEvents();
-  }, []);
+  }, [toast]);
 
   const sortEvents = () => {
     const sortedEvents = [...events].sort((a, b) => {
@@ -43,13 +51,28 @@ export default function EventsPage() {
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className=" shadow-xl rounded-lg overflow-hidden">
+        <div className="shadow-xl rounded-lg overflow-hidden">
           <div className="p-6 sm:p-8">
             <header className="flex flex-col sm:flex-row justify-between items-center mb-8">
               <Link href="/events">
-                <h1 className="text-3xl font-bold mb-4 sm:mb-0">Events</h1>
+                <h1 className="text-3xl font-bold text-gray-900 mb-4 sm:mb-0">
+                  Events
+                </h1>
               </Link>
-              <UserNav />
+              <div className="flex items-center space-x-4">
+                <Link href="/my-events">
+                  <Button variant="outline" className="flex items-center">
+                    <Calendar className="mr-2 h-4 w-4" /> My Events
+                  </Button>
+                </Link>
+                <Button
+                  onClick={() => router.push("/create-event")}
+                  className="flex items-center"
+                >
+                  <Plus className="mr-2 h-4 w-4" /> Create Event
+                </Button>
+                <UserNav />
+              </div>
             </header>
             <div className="mb-6">
               <Button
@@ -57,22 +80,13 @@ export default function EventsPage() {
                 variant="outline"
                 className="flex items-center"
               >
-                Sort by Date
+                Sort by Date{" "}
+                {sortOrder === "asc" ? "(Ascending)" : "(Descending)"}
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </div>
             {loading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-              </div>
-            ) : error ? (
-              <div
-                className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-                role="alert"
-              >
-                <strong className="font-bold">Error!</strong>
-                <span className="block sm:inline"> {error}</span>
-              </div>
+              <LoadingSpinner />
             ) : (
               <div className="overflow-hidden">
                 <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">

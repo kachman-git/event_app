@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Plus, Edit, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
+import { toast } from "@/components/ui/use-toast";
 
 export default function MyEventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -39,6 +40,11 @@ export default function MyEventsPage() {
         }
         setRsvpSummaries(summaries);
       } catch (err) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to fetch events. Please try again.",
+        });
         setError("Failed to fetch events");
       } finally {
         setLoading(false);
@@ -46,14 +52,23 @@ export default function MyEventsPage() {
     };
 
     fetchEvents();
-  }, []);
+  }, [toast]);
 
   const handleDelete = async (eventId: string) => {
     if (confirm("Are you sure you want to delete this event?")) {
       try {
         await eventApi.delete(eventId);
         setEvents(events.filter((event) => event.id !== eventId));
+        toast({
+          title: "Success",
+          description: "Event deleted successfully",
+        });
       } catch (err) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to delete event. Please try again.",
+        });
         setError("Failed to delete event");
       }
     }

@@ -7,25 +7,37 @@ import { CreateEventDto, UpdateEventDto } from "@/types";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
+import { BackButton } from "@/components/back-button";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CreateEventPage() {
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleSubmit = async (data: CreateEventDto | UpdateEventDto) => {
     try {
       await eventApi.create(data as CreateEventDto);
+      toast({
+        title: "Success",
+        description: "Event created successfully",
+      });
       router.push("/my-events");
     } catch (error) {
-      console.error("Failed to create event:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to create event. Please try again.",
+      });
     }
   };
 
   return (
     <div className="container mx-auto py-10">
+      <BackButton />
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>Create New Event</CardTitle>
