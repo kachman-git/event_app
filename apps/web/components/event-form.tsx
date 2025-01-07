@@ -13,7 +13,7 @@ const eventSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().min(1, 'Description is required'),
   location: z.string().min(1, 'Location is required'),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00.000Z$/, 'Invalid datetime format'),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00\.000Z$/, 'Invalid datetime format'),
 })
 
 interface EventFormProps {
@@ -26,21 +26,25 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
   const { toast } = useToast()
 
   const ensureFullISOString = (dateString: string): string => {
-    // If the dateString doesn't have seconds and milliseconds, add them
-    if (dateString.length === 16) { // YYYY-MM-DDTHH:mm
-      return `${dateString}:00.000Z`;
-    }
-    // If it has seconds but no milliseconds, add milliseconds
-    if (dateString.length === 19) { // YYYY-MM-DDTHH:mm:ss
-      return `${dateString}.000Z`;
-    }
-    // If it's already a full ISO string, return as is
-    if (dateString.endsWith('Z')) {
+    // If the dateString is already in the correct format, return it
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00\.000Z$/.test(dateString)) {
       return dateString;
     }
-    // For any other case, let's use the Date object to ensure correct formatting
+    
+    // If the dateString is in YYYY-MM-DDTHH:mm format, append ":00.000Z"
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(dateString)) {
+      return `${dateString}:00.000Z`;
+    }
+    
+    // For any other case, parse the date and format it correctly
     const date = new Date(dateString);
-    return date.toISOString();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}T${hours}:${minutes}:00.000Z`;
   };
 
   const form = useForm<z.infer<typeof eventSchema>>({
