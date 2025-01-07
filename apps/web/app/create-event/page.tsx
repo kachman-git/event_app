@@ -7,7 +7,7 @@ import { CreateEventDto } from '@/types'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { BackButton } from '@/components/back-button'
 import { useToast } from "@/hooks/use-toast"
-import { withProtectedRoute } from '@/components/protected-route'
+
 
 export default function CreateEventPage() {
   const router = useRouter()
@@ -47,5 +47,4 @@ export default function CreateEventPage() {
   )
 }
 
-export default withProtectedRoute(CreateEventPage)
 
