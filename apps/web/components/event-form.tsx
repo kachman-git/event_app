@@ -67,7 +67,8 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
         ...data,
         date: ensureFullISOString(data.date),
       }
-      await onSubmit(formattedData)
+    console.log('Formatted Data:', formattedData); 
+    await onSubmit(formattedData);
       toast({
         title: "Success",
         description: event?.id ? "Event updated successfully" : "Event created successfully",
