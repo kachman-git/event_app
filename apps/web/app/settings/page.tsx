@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/custom-button"
 import { BackButton } from '@/components/back-button'
-import { withProtectedRoute } from '@/components/protected-route'
+
 
 function SettingsPage() {
   const [user, setUser] = useState<User | null>(null)
@@ -135,5 +135,4 @@ function SettingsPage() {
   )
 }
 
-export default withProtectedRoute(SettingsPage)
 
