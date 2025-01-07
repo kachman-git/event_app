@@ -16,7 +16,6 @@ import { Loader2, Plus, Edit, Trash2 } from 'lucide-react';
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { toast } from "@/components/ui/use-toast";
-import { withProtectedRoute } from '@/components/protected-route'
 
 export default function MyEventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -148,5 +147,4 @@ export default function MyEventsPage() {
   );
 }
 
-export default withProtectedRoute(MyEventsPage)
 
