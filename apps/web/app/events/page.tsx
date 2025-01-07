@@ -55,7 +55,7 @@ export default function EventsPage() {
           <div className="p-6 sm:p-8">
             <header className="flex flex-col sm:flex-row justify-between items-center mb-8">
               <Link href="/events">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4 sm:mb-0">
+                <h1 className="text-3xl font-bold mb-4 sm:mb-0">
                   Events
                 </h1>
               </Link>
