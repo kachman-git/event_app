@@ -13,8 +13,7 @@ import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/custom-button"
 import { BackButton } from '@/components/back-button'
 
-
-function SettingsPage() {
+export default function SettingsPage() {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
@@ -26,8 +25,14 @@ function SettingsPage() {
       try {
         const userData = await userApi.getMe()
         setUser(userData)
-        const profileData = await profileApi.getMyProfile()
-        setProfile(profileData)
+        try {
+          const profileData = await profileApi.getMyProfile()
+          setProfile(profileData)
+        } catch (profileError) {
+          console.error('Failed to fetch profile:', profileError)
+          // If profile doesn't exist, set it to null
+          setProfile(null)
+        }
       } catch (err) {
         toast({
           variant: "destructive",
@@ -61,25 +66,25 @@ function SettingsPage() {
 
   const handleProfileUpdate = async (data: UpdateProfileDto) => {
     try {
-      let updatedProfile: Profile;
-      if (profile?.id) {
-        updatedProfile = await profileApi.update(profile.id, data);
+      let updatedProfile: Profile
+      if (profile) {
+        updatedProfile = await profileApi.update(profile.id, data)
       } else {
-        updatedProfile = await profileApi.create(data);
+        updatedProfile = await profileApi.create(data)
       }
-      setProfile(updatedProfile);
+      setProfile(updatedProfile)
       toast({
         title: "Success",
         description: profile ? "Profile updated successfully" : "Profile created successfully",
-      });
+      })
     } catch (err) {
       toast({
         variant: "destructive",
         title: "Error",
         description: "Failed to update profile",
-      });
+      })
     }
-  };
+  }
 
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light")
@@ -134,5 +139,4 @@ function SettingsPage() {
     </div>
   )
 }
-
 
