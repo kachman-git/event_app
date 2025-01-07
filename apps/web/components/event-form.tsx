@@ -5,7 +5,7 @@ import * as z from 'zod'
 import { Button } from "@/components/ui/custom-button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { eventApi } from '@/lib/api'
 import { CreateEventDto, UpdateEventDto } from '@/types'
 import { useToast } from "@/hooks/use-toast"
@@ -14,7 +14,7 @@ const eventSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().min(1, 'Description is required'),
   location: z.string().min(1, 'Location is required'),
-  date: z.date(),
+  date: z.string().min(1, 'Date is required'),
 })
 
 interface EventFormProps {
@@ -39,9 +39,10 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
   const handleSubmit = async (data: z.infer<typeof eventSchema>) => {
     setIsSubmitting(true)
     try {
+      // Ensure the date is in ISO format string
       const formattedData = {
         ...data,
-        date: data.date.toISOString(), // Convert to ISO string
+        date: new Date(data.date).toISOString(),
       }
       await onSubmit(formattedData)
       toast({
@@ -111,8 +112,7 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
                 <Input 
                   type="datetime-local" 
                   {...field} 
-                  value={field.value instanceof Date ? field.value.toISOString().slice(0, 16) : ''}
-                  onChange={(e) => field.onChange(new Date(e.target.value))}
+                  onChange={(e) => field.onChange(e.target.value)}
                 />
               </FormControl>
               <FormMessage />
