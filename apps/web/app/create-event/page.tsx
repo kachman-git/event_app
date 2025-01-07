@@ -22,6 +22,7 @@ export default function CreateEventPage() {
       })
       router.push(`/events/${newEvent.id}`)
     } catch (error) {
+      console.error('Error creating event:', error)
       toast({
         variant: "destructive",
         title: "Error",
