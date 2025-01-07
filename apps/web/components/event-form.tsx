@@ -121,26 +121,28 @@ const ensureFullISOString = (dateString: string): string => {
           )}
         />
         <FormField
-          control={form.control}
-          name="date"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Date and Time</FormLabel>
-              <FormControl>
-                 <Input
+  control={form.control}
+  name="date"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Date and Time</FormLabel>
+      <FormControl>
+        <Input 
           type="datetime-local"
-          {...field}
-          value={field.value.slice(0, 16)} // Ensure only YYYY-MM-DDTHH:mm is shown
+          {...field} 
+          value={field.value.slice(0, 16)} // Convert ISO string to local format
           onChange={(e) => {
-            const value = e.target.value;
-            field.onChange(ensureFullISOString(value)); // Convert to full ISO format on change
+            const localDateTime = e.target.value;
+            const fullISOString = ensureFullISOString(localDateTime);
+            field.onChange(fullISOString); // Update with the full ISO string
           }}
         />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+
         <Button type="submit" loading={isSubmitting}>
           {event?.id ? 'Update Event' : 'Create Event'}
         </Button>
