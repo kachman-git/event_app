@@ -61,28 +61,28 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
   })
 
   const handleSubmit = async (data: z.infer<typeof eventSchema>) => {
-    setIsSubmitting(true)
-    try {
-      const formattedData = {
-        ...data,
-        date: ensureFullISOString(data.date),
-      }
-    console.log('Formatted Data:', formattedData); 
+  setIsSubmitting(true);
+  try {
+    const formattedData = {
+      ...data,
+      date: ensureFullISOString(data.date), // Ensure ISO format
+    };
+    console.log('Formatted Data:', formattedData); // Debug output
     await onSubmit(formattedData);
-      toast({
-        title: "Success",
-        description: event?.id ? "Event updated successfully" : "Event created successfully",
-      })
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: event?.id ? "Failed to update event" : "Failed to create event",
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+    toast({
+      title: "Success",
+      description: event?.id ? "Event updated successfully" : "Event created successfully",
+    });
+  } catch (error) {
+    toast({
+      variant: "destructive",
+      title: "Error",
+      description: event?.id ? "Failed to update event" : "Failed to create event",
+    });
+  } finally {
+    setIsSubmitting(false);
   }
+};
 
   return (
     <Form {...form}>
