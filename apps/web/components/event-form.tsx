@@ -132,15 +132,15 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
             <FormItem>
               <FormLabel>Date and Time</FormLabel>
               <FormControl>
-                <Input 
-                  type="datetime-local" 
-                  {...field} 
-                  value={field.value.slice(0, 16)} // Show only YYYY-MM-DDTHH:mm in the input
-                  onChange={(e) => {
-                    const fullISOString = ensureFullISOString(e.target.value);
-                    field.onChange(fullISOString);
-                  }}
-                />
+                 <Input
+          type="datetime-local"
+          {...field}
+          value={field.value.slice(0, 16)} // Ensure only YYYY-MM-DDTHH:mm is shown
+          onChange={(e) => {
+            const value = e.target.value;
+            field.onChange(ensureFullISOString(value)); // Convert to full ISO format on change
+          }}
+        />
               </FormControl>
               <FormMessage />
             </FormItem>
