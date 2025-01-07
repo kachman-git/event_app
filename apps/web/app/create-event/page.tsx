@@ -1,39 +1,34 @@
-"use client";
+'use client'
 
-import { useRouter } from "next/navigation";
-import { EventForm } from "@/components/event-form";
-import { eventApi } from "@/lib/api";
-import { CreateEventDto, UpdateEventDto } from "@/types";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { BackButton } from "@/components/back-button";
-import { useToast } from "@/hooks/use-toast";
+import { useRouter } from 'next/navigation'
+import { EventForm } from '@/components/event-form'
+import { eventApi } from '@/lib/api'
+import { CreateEventDto } from '@/types'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { BackButton } from '@/components/back-button'
+import { useToast } from "@/hooks/use-toast"
+import { withProtectedRoute } from '@/components/protected-route'
 
 export default function CreateEventPage() {
-  const router = useRouter();
-  const { toast } = useToast();
+  const router = useRouter()
+  const { toast } = useToast()
 
-  const handleSubmit = async (data: CreateEventDto | UpdateEventDto) => {
+  const handleSubmit = async (data: CreateEventDto) => {
     try {
-      await eventApi.create(data as CreateEventDto);
+      const newEvent = await eventApi.create(data)
       toast({
         title: "Success",
         description: "Event created successfully",
-      });
-      router.push("/my-events");
+      })
+      router.push(`/events/${newEvent.id}`)
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
         description: "Failed to create event. Please try again.",
-      });
+      })
     }
-  };
+  }
 
   return (
     <div className="container mx-auto py-10">
@@ -41,14 +36,15 @@ export default function CreateEventPage() {
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>Create New Event</CardTitle>
-          <CardDescription>
-            Fill in the details to create a new event.
-          </CardDescription>
+          <CardDescription>Fill in the details to create a new event.</CardDescription>
         </CardHeader>
         <CardContent>
           <EventForm onSubmit={handleSubmit} />
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
+
+export default withProtectedRoute(CreateEventPage)
+
