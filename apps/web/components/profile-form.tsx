@@ -5,9 +5,8 @@ import * as z from 'zod'
 import { Button } from "@/components/ui/custom-button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { profileApi } from '@/lib/api'
-import { CreateProfileDto, UpdateProfileDto, Profile } from '@/types'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { UpdateProfileDto, Profile } from '@/types'
 import { useToast } from "@/hooks/use-toast"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
@@ -25,16 +24,15 @@ interface ProfileFormProps {
 
 export function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  // const [avatarFile, setAvatarFile] = useState<File | null>(null) //Removed
   const { toast } = useToast()
 
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
-    defaultValues: profile || {
-      bio: '',
-      phoneNumber: '',
-      address: '',
-      avatarUrl: '',
+    defaultValues: {
+      bio: profile?.bio || '',
+      phoneNumber: profile?.phoneNumber || '',
+      address: profile?.address || '',
+      avatarUrl: profile?.avatarUrl || '',
     },
   })
 
@@ -57,15 +55,15 @@ export function ProfileForm({ profile, onSubmit }: ProfileFormProps) {
     }
   }
 
-  // const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => { //Removed
-  //   if (event.target.files && event.target.files[0]) {
-  //     setAvatarFile(event.target.files[0])
-  //   }
-  // }
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+        <div className="flex items-center space-x-4">
+          <Avatar className="h-24 w-24">
+            <AvatarImage src={form.watch('avatarUrl')} />
+            <AvatarFallback>{profile?.userId?.charAt(0) || 'U'}</AvatarFallback>
+          </Avatar>
+        </div>
         <FormField
           control={form.control}
           name="avatarUrl"
