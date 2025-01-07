@@ -1,82 +1,75 @@
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { Button } from "@/components/ui/custom-button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { CreateEventDto, UpdateEventDto } from '@/types'
-import { useToast } from "@/hooks/use-toast"
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from "@/components/ui/custom-button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { CreateEventDto, UpdateEventDto } from '@/types';
+import { useToast } from "@/hooks/use-toast";
 
 const eventSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().min(1, 'Description is required'),
   location: z.string().min(1, 'Location is required'),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00\.000Z$/, 'Invalid datetime format'),
-})
+  date: z.string().regex(
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+    'Invalid datetime format'
+  ),
+});
 
 interface EventFormProps {
-  event?: CreateEventDto & { id?: string }
-  onSubmit: (data: CreateEventDto | UpdateEventDto) => void
+  event?: CreateEventDto & { id?: string };
+  onSubmit: (data: CreateEventDto | UpdateEventDto) => void;
 }
 
 export function EventForm({ event, onSubmit }: EventFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const { toast } = useToast()
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
-const ensureFullISOString = (dateString: string): string => {
-  // If the dateString is already in the correct format, return it
-  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00\.000Z$/.test(dateString)) {
-    return dateString;
-  }
-  
-  // If the dateString is in YYYY-MM-DDTHH:mm format, append ":00.000Z"
-  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(dateString)) {
-    return `${dateString}:00.000Z`;
-  }
-  
-  // Parse other cases to ISO format
-  const date = new Date(dateString);
-  return date.toISOString();
-};
+  const ensureFullISOString = (dateString: string): string => {
+    const date = new Date(dateString);
+    return date.toISOString();
+  };
 
   const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
-    defaultValues: event ? {
-      ...event,
-      date: ensureFullISOString(event.date),
-    } : {
-      title: '',
-      description: '',
-      location: '',
-      date: new Date().toISOString(),
-    },
-  })
+    defaultValues: event
+      ? {
+          ...event,
+          date: ensureFullISOString(event.date),
+        }
+      : {
+          title: '',
+          description: '',
+          location: '',
+          date: new Date().toISOString(),
+        },
+  });
 
   const handleSubmit = async (data: z.infer<typeof eventSchema>) => {
-  setIsSubmitting(true);
-  try {
-    const formattedData = {
-      ...data,
-      date: ensureFullISOString(data.date), // Ensure ISO format
-    };
-    console.log('Formatted Data:', formattedData); // Debug output
-    await onSubmit(formattedData);
-    toast({
-      title: "Success",
-      description: event?.id ? "Event updated successfully" : "Event created successfully",
-    });
-  } catch (error) {
-    toast({
-      variant: "destructive",
-      title: "Error",
-      description: event?.id ? "Failed to update event" : "Failed to create event",
-    });
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+    setIsSubmitting(true);
+    try {
+      const formattedData = {
+        ...data,
+        date: ensureFullISOString(data.date), // Ensure ISO-8601 format
+      };
+      await onSubmit(formattedData);
+      toast({
+        title: "Success",
+        description: event?.id ? "Event updated successfully" : "Event created successfully",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: event?.id ? "Failed to update event" : "Failed to create event",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <Form {...form}>
@@ -121,33 +114,31 @@ const ensureFullISOString = (dateString: string): string => {
           )}
         />
         <FormField
-  control={form.control}
-  name="date"
-  render={({ field }) => (
-    <FormItem>
-      <FormLabel>Date and Time</FormLabel>
-      <FormControl>
-        <Input 
-          type="datetime-local"
-          {...field} 
-          value={field.value.slice(0, 16)} // Convert ISO string to local format
-          onChange={(e) => {
-            const localDateTime = e.target.value;
-            const fullISOString = ensureFullISOString(localDateTime);
-            field.onChange(fullISOString); // Update with the full ISO string
-          }}
+          control={form.control}
+          name="date"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Date and Time</FormLabel>
+              <FormControl>
+                <Input
+                  type="datetime-local"
+                  {...field}
+                  value={field.value ? field.value.slice(0, 16) : ''}
+                  onChange={(e) => {
+                    const localDateTime = e.target.value;
+                    const isoString = ensureFullISOString(localDateTime);
+                    field.onChange(isoString);
+                  }}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </FormControl>
-      <FormMessage />
-    </FormItem>
-  )}
-/>
-
         <Button type="submit" loading={isSubmitting}>
           {event?.id ? 'Update Event' : 'Create Event'}
         </Button>
       </form>
     </Form>
-  )
+  );
 }
-
