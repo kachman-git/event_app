@@ -13,7 +13,7 @@ const eventSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().min(1, 'Description is required'),
   location: z.string().min(1, 'Location is required'),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/, 'Invalid ISO-8601 datetime format'),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00\.000Z$/, 'Invalid datetime format'),
 })
 
 interface EventFormProps {
@@ -26,9 +26,22 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
   const { toast } = useToast()
 
   const ensureFullISOString = (dateString: string): string => {
+    // If the dateString doesn't have seconds and milliseconds, add them
+    if (dateString.length === 16) { // YYYY-MM-DDTHH:mm
+      return `${dateString}:00.000Z`;
+    }
+    // If it has seconds but no milliseconds, add milliseconds
+    if (dateString.length === 19) { // YYYY-MM-DDTHH:mm:ss
+      return `${dateString}.000Z`;
+    }
+    // If it's already a full ISO string, return as is
+    if (dateString.endsWith('Z')) {
+      return dateString;
+    }
+    // For any other case, let's use the Date object to ensure correct formatting
     const date = new Date(dateString);
     return date.toISOString();
-  }
+  };
 
   const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
@@ -113,12 +126,12 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
           name="date"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Date and Time (ISO-8601)</FormLabel>
+              <FormLabel>Date and Time</FormLabel>
               <FormControl>
                 <Input 
                   type="datetime-local" 
                   {...field} 
-                  value={field.value.slice(0, -8)} // Remove milliseconds and 'Z' for input
+                  value={field.value.slice(0, 16)} // Show only YYYY-MM-DDTHH:mm in the input
                   onChange={(e) => {
                     const fullISOString = ensureFullISOString(e.target.value);
                     field.onChange(fullISOString);
