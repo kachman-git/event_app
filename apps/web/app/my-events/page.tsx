@@ -8,15 +8,15 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus, Edit, Trash2 } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2 } from 'lucide-react';
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { toast } from "@/components/ui/use-toast";
+import { withProtectedRoute } from '@/components/protected-route'
 
 export default function MyEventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -147,3 +147,6 @@ export default function MyEventsPage() {
     </div>
   );
 }
+
+export default withProtectedRoute(MyEventsPage)
+
