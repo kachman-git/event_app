@@ -52,7 +52,7 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
   if (contentType && contentType.includes("application/json")) {
     return response.json();
   }
-
+  console.log(`${API_BASE_URL}${url}`)
   return response.text();
 }
 
