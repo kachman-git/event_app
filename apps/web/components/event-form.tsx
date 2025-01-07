@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/custom-button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { eventApi } from '@/lib/api'
 import { CreateEventDto, UpdateEventDto } from '@/types'
 import { useToast } from "@/hooks/use-toast"
 
@@ -14,7 +13,7 @@ const eventSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().min(1, 'Description is required'),
   location: z.string().min(1, 'Location is required'),
-  date: z.string().min(1, 'Date is required'),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z?$/, 'Invalid ISO-8601 datetime format'),
 })
 
 interface EventFormProps {
@@ -28,18 +27,21 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
 
   const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
-    defaultValues: event || {
+    defaultValues: event ? {
+      ...event,
+      date: event.date.endsWith('Z') ? event.date : new Date(event.date).toISOString(),
+    } : {
       title: '',
       description: '',
       location: '',
-      date: '',
+      date: new Date().toISOString().slice(0, -8), // Remove milliseconds and 'Z'
     },
   })
 
   const handleSubmit = async (data: z.infer<typeof eventSchema>) => {
     setIsSubmitting(true)
     try {
-      // Ensure the date is in ISO format string
+      // Ensure the date is in full ISO-8601 format
       const formattedData = {
         ...data,
         date: new Date(data.date).toISOString(),
@@ -107,12 +109,16 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
           name="date"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Date and Time</FormLabel>
+              <FormLabel>Date and Time (ISO-8601)</FormLabel>
               <FormControl>
                 <Input 
                   type="datetime-local" 
                   {...field} 
-                  onChange={(e) => field.onChange(e.target.value)}
+                  value={field.value.slice(0, -8)} // Remove milliseconds and 'Z' for input
+                  onChange={(e) => {
+                    const date = new Date(e.target.value);
+                    field.onChange(date.toISOString());
+                  }}
                 />
               </FormControl>
               <FormMessage />
