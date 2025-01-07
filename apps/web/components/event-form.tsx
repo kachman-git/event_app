@@ -25,27 +25,21 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { toast } = useToast()
 
-  const ensureFullISOString = (dateString: string): string => {
-    // If the dateString is already in the correct format, return it
-    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00\.000Z$/.test(dateString)) {
-      return dateString;
-    }
-    
-    // If the dateString is in YYYY-MM-DDTHH:mm format, append ":00.000Z"
-    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(dateString)) {
-      return `${dateString}:00.000Z`;
-    }
-    
-    // For any other case, parse the date and format it correctly
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    
-    return `${year}-${month}-${day}T${hours}:${minutes}:00.000Z`;
-  };
+const ensureFullISOString = (dateString: string): string => {
+  // If the dateString is already in the correct format, return it
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00\.000Z$/.test(dateString)) {
+    return dateString;
+  }
+  
+  // If the dateString is in YYYY-MM-DDTHH:mm format, append ":00.000Z"
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(dateString)) {
+    return `${dateString}:00.000Z`;
+  }
+  
+  // Parse other cases to ISO format
+  const date = new Date(dateString);
+  return date.toISOString();
+};
 
   const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
