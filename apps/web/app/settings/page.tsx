@@ -61,29 +61,25 @@ function SettingsPage() {
 
   const handleProfileUpdate = async (data: UpdateProfileDto) => {
     try {
+      let updatedProfile: Profile;
       if (profile?.id) {
-        const updatedProfile = await profileApi.update(profile.id, data)
-        setProfile(updatedProfile)
-        toast({
-          title: "Success",
-          description: "Profile updated successfully",
-        })
+        updatedProfile = await profileApi.update(profile.id, data);
       } else {
-        const newProfile = await profileApi.create(data)
-        setProfile(newProfile)
-        toast({
-          title: "Success",
-          description: "Profile created successfully",
-        })
+        updatedProfile = await profileApi.create(data);
       }
+      setProfile(updatedProfile);
+      toast({
+        title: "Success",
+        description: profile ? "Profile updated successfully" : "Profile created successfully",
+      });
     } catch (err) {
       toast({
         variant: "destructive",
         title: "Error",
         description: "Failed to update profile",
-      })
+      });
     }
-  }
+  };
 
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light")
