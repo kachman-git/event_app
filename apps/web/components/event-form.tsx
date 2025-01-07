@@ -13,7 +13,7 @@ const eventSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().min(1, 'Description is required'),
   location: z.string().min(1, 'Location is required'),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z?$/, 'Invalid ISO-8601 datetime format'),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/, 'Invalid ISO-8601 datetime format'),
 })
 
 interface EventFormProps {
@@ -25,26 +25,30 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { toast } = useToast()
 
+  const ensureFullISOString = (dateString: string): string => {
+    const date = new Date(dateString);
+    return date.toISOString();
+  }
+
   const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
     defaultValues: event ? {
       ...event,
-      date: event.date.endsWith('Z') ? event.date : new Date(event.date).toISOString(),
+      date: ensureFullISOString(event.date),
     } : {
       title: '',
       description: '',
       location: '',
-      date: new Date().toISOString().slice(0, -8), // Remove milliseconds and 'Z'
+      date: new Date().toISOString(),
     },
   })
 
   const handleSubmit = async (data: z.infer<typeof eventSchema>) => {
     setIsSubmitting(true)
     try {
-      // Ensure the date is in full ISO-8601 format
       const formattedData = {
         ...data,
-        date: new Date(data.date).toISOString(),
+        date: ensureFullISOString(data.date),
       }
       await onSubmit(formattedData)
       toast({
@@ -116,8 +120,8 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
                   {...field} 
                   value={field.value.slice(0, -8)} // Remove milliseconds and 'Z' for input
                   onChange={(e) => {
-                    const date = new Date(e.target.value);
-                    field.onChange(date.toISOString());
+                    const fullISOString = ensureFullISOString(e.target.value);
+                    field.onChange(fullISOString);
                   }}
                 />
               </FormControl>
