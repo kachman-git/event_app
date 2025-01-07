@@ -18,7 +18,7 @@ import {
 } from "@/types";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3333";
+  process.env.NEXT_PUBLIC_API_BASE_URL;
 
 async function fetchWithAuth(url: string, options: RequestInit = {}) {
   const token = localStorage.getItem("token");
@@ -186,35 +186,4 @@ export const userApi = {
     }),
 };
 
-// import {
-//   eventApi,
-//   profileApi,
-//   authApi,
-//   rsvpApi,
-//   tagsApi,
-//   userApi,
-// } from "../api/api";
 
-// // Example usage in a React component
-// const MyComponent = () => {
-//   const [events, setEvents] = useState<Event[]>([]);
-//   const [rsvps, setRSVPs] = useState<RSVP[]>([]);
-
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       try {
-//         const fetchedEvents = await eventApi.getAll();
-//         setEvents(fetchedEvents);
-
-//         const userRSVPs = await rsvpApi.getUserRSVPs();
-//         setRSVPs(userRSVPs);
-//       } catch (error) {
-//         console.error("Failed to fetch data:", error);
-//       }
-//     };
-
-//     fetchData();
-//   }, []);
-
-//   // ... rest of the component
-// };
