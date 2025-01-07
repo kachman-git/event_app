@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation'
 import { useToast } from "@/hooks/use-toast"
 import { LoadingSpinner } from '@/components/loading-spinner'
 import Link from 'next/link'
-import { withProtectedRoute } from '@/components/protected-route'
+
 
 export default function EventsPage() {
   const router = useRouter()
@@ -108,5 +108,4 @@ export default function EventsPage() {
   )
 }
 
-export default withProtectedRoute(EventsPage)
 
