@@ -29,6 +29,7 @@ type SignUpFormValues = z.infer<typeof signUpSchema>
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
 
@@ -42,6 +43,7 @@ export default function SignUp() {
   })
 
   const onSubmit = async (data: SignUpFormValues) => {
+    setIsLoading(true)
     try {
       await authApi.signup(data)
       toast({
@@ -56,13 +58,15 @@ export default function SignUp() {
         description: "Sign up failed. Please try again.",
       })
       console.error('Sign up failed:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-center min-h-screen ">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-md space-y-4  p-8 rounded-xl shadow-md">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-md space-y-4 p-8 rounded-xl shadow-md">
           <h2 className="text-2xl font-bold text-center mb-6">Sign Up</h2>
           <FormField
             control={form.control}
@@ -116,7 +120,9 @@ export default function SignUp() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full">Sign Up</Button>
+          <Button type="submit" className="w-full" loading={isLoading}>
+            Sign Up
+          </Button>
           <p className="text-center text-sm">
             Already have an account? <Link href="/signin" className="text-blue-600 hover:underline">Sign In</Link>
           </p>
