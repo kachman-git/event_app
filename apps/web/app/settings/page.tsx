@@ -13,7 +13,7 @@ import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/custom-button"
 import { BackButton } from '@/components/back-button'
 
-export function SettingsPage() {
+export default function SettingsPage() {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
