@@ -158,7 +158,7 @@ export const rsvpApi = {
 };
 
 // Tags API
-export const tagsApi = {
+export const tagApi = {
   create: (data: CreateTagDto): Promise<Tag> =>
     fetchWithAuth("/tags", {
       method: "POST",
