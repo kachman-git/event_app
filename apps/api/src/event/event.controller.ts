@@ -22,8 +22,8 @@ export class EventController {
   constructor(private readonly eventService: EventService) {}
 
   @Get('all')
-  getEventsAll(@GetUser('id') organizerId: string) {
-    return this.eventService.getEvents(organizerId);
+  getEventsAll() {
+    return this.eventService.getEvents();
   }
 
   @Get('me')
