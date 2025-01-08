@@ -45,14 +45,16 @@ export interface CreateEventDto {
   title: string;
   description: string;
   location: string;
-  date: string;
+  date: string; 
+  tags: string[];
 }
 
 export interface UpdateEventDto {
   title?: string;
   description?: string;
   location?: string;
-  date?: string;
+  date?: string; 
+  tags?: string[];
 }
 
 export interface CreateProfileDto {
