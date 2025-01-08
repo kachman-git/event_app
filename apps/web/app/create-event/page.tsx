@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { EventForm } from '@/components/event-form'
 import { eventApi } from '@/lib/api'
-import { CreateEventDto } from '@/types'
+import { CreateEventDto , UpdateEventDto } from '@/types'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { BackButton } from '@/components/back-button'
 import { useToast } from "@/hooks/use-toast"
@@ -13,9 +13,9 @@ export default function CreateEventPage() {
   const router = useRouter()
   const { toast } = useToast()
 
-  const handleSubmit = async (data: CreateEventDto) => {
+  const handleSubmit = async (data: CreateEventDto | UpdateEventDto) => {
     try {
-      const newEvent = await eventApi.create(data)
+      const newEvent = await eventApi.create(data as CreateEventDto)
       toast({
         title: "Success",
         description: "Event created successfully",
