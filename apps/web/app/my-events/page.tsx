@@ -10,6 +10,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Plus, Edit, Trash2 } from 'lucide-react';
