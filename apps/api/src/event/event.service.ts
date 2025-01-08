@@ -6,17 +6,20 @@ import { CreateEventDto, UpdateEventDto } from './dto';
 export class EventService {
   constructor(private prisma: PrismaService) {}
 
-  getEventsAll() {
-    return this.prisma.event.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-      include: {
-        tags: true,
-        rsvps: true,
-      },
-    });
-  }
+getEventsAll() {
+  const events = this.prisma.event.findMany({
+    orderBy: {
+      createdAt: 'desc',
+    },
+    include: {
+      tags: true,
+      rsvps: true,
+    },
+  });
+  console.log('Fetched events:', events);
+  return events;
+}
+
 
   getEvents(organizerId: string) {
     return this.prisma.event.findMany({
