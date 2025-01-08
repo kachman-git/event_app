@@ -74,7 +74,13 @@ export function EventsTable({ events }: EventsTableProps) {
                   return (
                     <TableRow 
                       key={event.id} 
-                      className={`${isPastEvent ? 'bg-gray-100 opacity-50' : index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} transition-colors hover:bg-gray-100`}
+                      className={`${
+                        isPastEvent 
+                          ? 'bg-gray-100 dark:bg-gray-800 opacity-50' 
+                          : index % 2 === 0 
+                            ? 'bg-white dark:bg-gray-900' 
+                            : 'bg-gray-50 dark:bg-gray-800'
+                      } transition-colors hover:bg-gray-100 dark:hover:bg-gray-700`}
                     >
                       <TableCell className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         <Link href={`/events/${event.id}`} className="hover:underline">
