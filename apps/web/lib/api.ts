@@ -109,7 +109,12 @@ export const profileApi = {
 
 // Auth API
 export const setAuthToken = (token: string) => {
-  localStorage.setItem("token", token);
+  const allToken = localStorage.getItem("token");
+  if(allToken){
+     localStorage.removeItem("token");
+  } else{
+    localStorage.setItem("token", token);
+  }
 };
 
 export const authApi = {
