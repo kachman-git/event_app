@@ -23,7 +23,7 @@ export class EventController {
 
   @Get('all')
   getEventsAll() {
-    return this.eventService.getEvents();
+    return this.eventService.getEventsAll();
   }
 
   @Get('me')
