@@ -56,7 +56,7 @@ export function Countdown({ targetDate }: CountdownProps) {
   });
 
   return (
-    <div className="text-center p-4 bg-gray-100 rounded-lg">
+    <div className="text-center p-4 rounded-lg">
       <h2 className="text-xl font-semibold mb-2">Time until event starts:</h2>
       <div className="flex justify-center space-x-4">
         {timerComponents.length ? (
