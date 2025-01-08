@@ -15,19 +15,14 @@ import { useToast } from "@/hooks/use-toast"
 
 const signInSchema = z.object({
   email: z.string().email('Invalid email address').nonempty('Email is required'),
-  password: z.string()
-    .nonempty('Password is required')
-    .min(8, 'Password must be at least 8 characters long')
-    .regex(/(?=.*[a-z])/, 'Password must contain at least one lowercase letter')
-    .regex(/(?=.*[A-Z])/, 'Password must contain at least one uppercase letter')
-    .regex(/(?=.*\d)/, 'Password must contain at least one number')
-    .regex(/(?=.*[@$!%*?&])/, 'Password must contain at least one special character')
+  password: z.string().nonempty('Password is required')
 })
 
 type SignInFormValues = z.infer<typeof signInSchema>
 
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
 
@@ -40,6 +35,7 @@ export default function SignIn() {
   })
 
   const onSubmit = async (data: SignInFormValues) => {
+    setIsLoading(true)
     try {
       await authApi.signin({ ...data, name: '' })
       toast({
@@ -54,11 +50,13 @@ export default function SignIn() {
         description: "Sign in failed. Please check your credentials and try again.",
       })
       console.error('Sign in failed:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-center min-h-screen ">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-md space-y-4 p-8 rounded-xl shadow-md">
           <h2 className="text-2xl font-bold text-center mb-6">Sign In</h2>
@@ -101,7 +99,9 @@ export default function SignIn() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full">Sign In</Button>
+          <Button type="submit" className="w-full" loading={isLoading}>
+            Sign In
+          </Button>
           <p className="text-center text-sm">
             Don't have an account? <Link href="/signup" className="text-blue-600 hover:underline">Sign Up</Link>
           </p>
