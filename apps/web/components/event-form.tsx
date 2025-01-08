@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/custom-button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { CreateEventDto, UpdateEventDto } from '@/types'
+import { CreateEventDto, UpdateEventDto, Tag } from '@/types'
 import { useToast } from "@/hooks/use-toast"
 import { TagInput } from './tag-input'
 
@@ -18,13 +18,13 @@ const eventSchema = z.object({
 })
 
 interface EventFormProps {
-  event?: CreateEventDto & { id?: string, tags?: string[] }
+  event?: CreateEventDto & { id?: string, tags?: Tag[] }
   onSubmit: (data: CreateEventDto | UpdateEventDto) => void
 }
 
 export function EventForm({ event, onSubmit }: EventFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [tags, setTags] = useState<string[]>(event?.tags || [])
+  const [tags, setTags] = useState<Tag[]>(event?.tags || [])
   const { toast } = useToast()
 
   const ensureFullISOString = (dateString: string): string => {
@@ -65,7 +65,7 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
       const formattedData = {
         ...data,
         date: ensureFullISOString(data.date),
-        tags: tags,
+        tags: tags.map(tag => tag.id),
       }
       await onSubmit(formattedData)
       toast({
@@ -81,6 +81,10 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const handleTagsChange = (newTags: Tag[]) => {
+    setTags(newTags)
   }
 
   return (
@@ -148,7 +152,11 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
         />
         <FormItem>
           <FormLabel>Tags</FormLabel>
-          <TagInput tags={tags} setTags={setTags} />
+          <TagInput 
+            eventId={event?.id || ''} 
+            initialTags={event?.tags} 
+            onTagsChange={handleTagsChange} 
+          />
         </FormItem>
         <Button type="submit" loading={isSubmitting}>
           {event?.id ? 'Update Event' : 'Create Event'}
