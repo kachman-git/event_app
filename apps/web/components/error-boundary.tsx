@@ -29,7 +29,7 @@ class ErrorBoundaryClass extends React.Component<ErrorBoundaryProps, ErrorBounda
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <div className="flex flex-col items-center justify-center min-h-screen">
           <h1 className="text-2xl font-bold mb-4">Oops! Something went wrong.</h1>
           <p className="text-gray-600 mb-4">We're sorry for the inconvenience. Please try refreshing the page.</p>
           <button
