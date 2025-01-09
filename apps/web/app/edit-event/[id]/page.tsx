@@ -38,9 +38,9 @@ function EventPage() {
     fetchEvent()
   }, [id, toast])
 
-  const handleUpdate = async (data) => {
+  const handleUpdate = async (data: CreateEventDto | UpdateEventDto) => {
     try {
-      const updatedEvent = await eventApi.update(id as string, data)
+      const updatedEvent = await eventApi.update(id as string, data as UpdateEventDto)
       setEvent(updatedEvent)
       setIsEditing(false)
       toast({
