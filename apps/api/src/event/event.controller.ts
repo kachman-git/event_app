@@ -33,10 +33,9 @@ export class EventController {
 
   @Get(':id')
   getEventById(
-    @GetUser('id') organizerId: string,
     @Param('id', ParseUUIDPipe) eventId: string,
   ) {
-    return this.eventService.getEventById(organizerId, eventId);
+    return this.eventService.getEventById(eventId);
   }
 
   @Post()
