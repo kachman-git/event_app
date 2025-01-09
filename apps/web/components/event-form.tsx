@@ -9,6 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { CreateEventDto, UpdateEventDto, Event, Tag } from '@/types'
 import { useToast } from "@/hooks/use-toast"
 import { TagInput } from './tag-input'
+import { eventApi, tagApi } from '@/lib/api'
 
 const eventSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -46,6 +47,32 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
     return `${year}-${month}-${day}T${hours}:${minutes}:00.000Z`;
   };
 
+  const createTag = async (tagName: string) => {
+    try {
+      await tagApi.create({ name: tagName, eventId: event?.id || 'temp' })
+      return true
+    } catch (error) {
+      console.error('Failed to create tag:', error)
+      return false
+    }
+  }
+
+  const deleteTag = async (tagName: string) => {
+    if (event?.id) {
+      const tagToDelete = event.tags.find(tag => tag.name === tagName)
+      if (tagToDelete) {
+        try {
+          await tagApi.delete(tagToDelete.id)
+          return true
+        } catch (error) {
+          console.error('Failed to delete tag:', error)
+          return false
+        }
+      }
+    }
+    return false
+  }
+
   const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
     defaultValues: event ? {
@@ -69,6 +96,22 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
         date: ensureFullISOString(data.date),
         tags: tags,
       }
+      
+      if (event?.id) {
+        // Handle tag updates for existing events
+        const existingTags = event.tags.map(tag => tag.name)
+        const tagsToAdd = tags.filter(tag => !existingTags.includes(tag))
+        const tagsToRemove = existingTags.filter(tag => !tags.includes(tag))
+
+        for (const tagName of tagsToAdd) {
+          await createTag(tagName)
+        }
+
+        for (const tagName of tagsToRemove) {
+          await deleteTag(tagName)
+        }
+      }
+
       await onSubmit(formattedData)
       toast({
         title: "Success",
