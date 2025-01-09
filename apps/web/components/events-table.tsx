@@ -13,13 +13,14 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Event } from '@/types'
 import { formatDistanceToNow, isPast, formatDistance } from 'date-fns'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Trash2 } from 'lucide-react'
 
 interface EventsTableProps {
   events: Event[]
+  onDeleteEvent: (eventId: string) => void
 }
 
-export function EventsTable({ events }: EventsTableProps) {
+export function EventsTable({ events, onDeleteEvent }: EventsTableProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const eventsPerPage = 10
@@ -51,22 +52,23 @@ export function EventsTable({ events }: EventsTableProps) {
       </div>
       <div className="overflow-x-auto">
         <div className="inline-block min-w-full align-middle">
-          <div className="overflow-hidden border border-gray-200 sm:rounded-lg">
-            <Table>
+          <div className="overflow-hidden border border-gray-200 dark:border-gray-700 sm:rounded-lg">
+            <Table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <TableCaption>A list of all events</TableCaption>
-              <TableHeader>
+              <TableHeader className="bg-gray-50 dark:bg-gray-800">
                 <TableRow>
-                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</TableHead>
-                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</TableHead>
-                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</TableHead>
-                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</TableHead>
-                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time Remaining</TableHead>
-                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tags</TableHead>
-                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created at</TableHead>
-                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Updated at</TableHead>
+                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Title</TableHead>
+                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Description</TableHead>
+                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Location</TableHead>
+                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date</TableHead>
+                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Time Remaining</TableHead>
+                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Tags</TableHead>
+                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Created at</TableHead>
+                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Updated at</TableHead>
+                  <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
+              <TableBody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
                 {currentEvents.map((event, index) => {
                   const eventDate = new Date(event.date)
                   const isPastEvent = isPast(eventDate)
@@ -82,26 +84,37 @@ export function EventsTable({ events }: EventsTableProps) {
                             : 'bg-gray-50 dark:bg-gray-800'
                       } transition-colors hover:bg-gray-100 dark:hover:bg-gray-700`}
                     >
-                      <TableCell className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        <Link href={`/events/${event.id}`} className="hover:underline text-blue-600 dark:text-blue-400">
+                      <TableCell className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                        <Link href={`/events/${event.id}`} className="hover:underline">
                           {event.title}
                         </Link>
                       </TableCell>
-                      <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{event.description}</TableCell>
-                      <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{event.location}</TableCell>
-                      <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{eventDate.toLocaleDateString()}</TableCell>
-                      <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{event.description}</TableCell>
+                      <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{event.location}</TableCell>
+                      <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{eventDate.toLocaleDateString()}</TableCell>
+                      <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                         {isPastEvent ? (
                           <span className="text-red-500">Event date passed</span>
                         ) : (
                           formatDistance(eventDate, currentDate, { addSuffix: true })
                         )}
                       </TableCell>
-                      <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                         {event.tags?.map(tag => tag.name).join(', ')}
                       </TableCell>
-                      <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDistanceToNow(new Date(event.createdAt), { addSuffix: true })}</TableCell>
-                      <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDistanceToNow(new Date(event.updatedAt), { addSuffix: true })}</TableCell>
+                      <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{formatDistanceToNow(new Date(event.createdAt), { addSuffix: true })}</TableCell>
+                      <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{formatDistanceToNow(new Date(event.updatedAt), { addSuffix: true })}</TableCell>
+                      <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                        <Button
+                          onClick={() => onDeleteEvent(event.id)}
+                          variant="destructive"
+                          size="sm"
+                          className="flex items-center"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   )
                 })}
@@ -110,7 +123,7 @@ export function EventsTable({ events }: EventsTableProps) {
           </div>
         </div>
       </div>
-      <div className="mt-4 flex justify-between items-center">
+      <div className="mt-4 flex justify-between items-center text-sm text-gray-700 dark:text-gray-300">
         <div>
           Showing {indexOfFirstEvent + 1} to {Math.min(indexOfLastEvent, filteredEvents.length)} of {filteredEvents.length} events
         </div>
