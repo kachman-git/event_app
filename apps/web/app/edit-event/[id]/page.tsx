@@ -2,19 +2,21 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { EventForm } from '@/components/event-form'
+import { Event } from '@/types'
 import { eventApi } from '@/lib/api'
-import { UpdateEventDto, Event } from '@/types'
+import { EventForm } from '@/components/event-form'
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Loader2 } from 'lucide-react'
+import { Loader2, Edit, Trash2 } from 'lucide-react'
 import { BackButton } from '@/components/back-button'
 import { useToast } from "@/hooks/use-toast"
 
-export default function EditEventPage() {
+function EventPage() {
   const router = useRouter()
   const { id } = useParams()
   const [event, setEvent] = useState<Event | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isEditing, setIsEditing] = useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -26,7 +28,7 @@ export default function EditEventPage() {
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Failed to fetch event",
+          description: "Failed to fetch event details",
         })
       } finally {
         setLoading(false)
@@ -36,20 +38,40 @@ export default function EditEventPage() {
     fetchEvent()
   }, [id, toast])
 
-  const handleSubmit = async (data: UpdateEventDto) => {
+  const handleUpdate = async (data) => {
     try {
-      await eventApi.update(id as string, data)
+      const updatedEvent = await eventApi.update(id as string, data)
+      setEvent(updatedEvent)
+      setIsEditing(false)
       toast({
         title: "Success",
         description: "Event updated successfully",
       })
-      router.push('/my-events')
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update event. Please try again.",
+        description: "Failed to update event",
       })
+    }
+  }
+
+  const handleDelete = async () => {
+    if (confirm('Are you sure you want to delete this event? This will also delete all associated tags.')) {
+      try {
+        await eventApi.delete(id as string)
+        toast({
+          title: "Success",
+          description: "Event and associated tags deleted successfully",
+        })
+        router.push('/events')
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to delete event and tags",
+        })
+      }
     }
   }
 
@@ -81,14 +103,42 @@ export default function EditEventPage() {
       <BackButton />
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
-          <CardTitle>Edit Event</CardTitle>
-          <CardDescription>Update the details of your event.</CardDescription>
+          <CardTitle>{isEditing ? 'Edit Event' : event.title}</CardTitle>
+          <CardDescription>{isEditing ? 'Update the details of your event.' : `Event on ${new Date(event.date).toLocaleDateString()}`}</CardDescription>
         </CardHeader>
         <CardContent>
-          <EventForm event={event} onSubmit={handleSubmit} />
+          {isEditing ? (
+            <EventForm event={event} onSubmit={handleUpdate} />
+          ) : (
+            <div className="space-y-4">
+              <p><strong>Description:</strong> {event.description}</p>
+              <p><strong>Location:</strong> {event.location}</p>
+              <p><strong>Date:</strong> {new Date(event.date).toLocaleString()}</p>
+              <div>
+                <strong>Tags:</strong>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {event.tags?.map(tag => (
+                    <span key={tag.id} className="bg-primary text-primary-foreground px-2 py-1 rounded-full text-sm">
+                      {tag.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="flex space-x-2 mt-4">
+                <Button onClick={() => setIsEditing(true)} className="flex items-center">
+                  <Edit className="mr-2 h-4 w-4" /> Edit Event
+                </Button>
+                <Button onClick={handleDelete} variant="destructive" className="flex items-center">
+                  <Trash2 className="mr-2 h-4 w-4" /> Delete Event
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
   )
 }
+
+export default EventPage
 
