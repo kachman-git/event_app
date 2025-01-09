@@ -1,109 +1,63 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { X } from 'lucide-react'
 import { Loader2 } from 'lucide-react'
 import { tagApi } from '@/lib/api'
-import { Tag, CreateTagDto, UpdateTagDto } from '@/types'
-import { useToast } from "@/hooks/use-toast"
 
 interface TagInputProps {
-  eventId: string
-  initialTags?: Tag[]
-  onTagsChange?: (tags: Tag[]) => void
+  tags: string[]
+  setTags: React.Dispatch<React.SetStateAction<string[]>>
+  isEditing: boolean
 }
 
-export function TagInput({ eventId, initialTags = [], onTagsChange }: TagInputProps) {
-  const [tags, setTags] = useState<Tag[]>(initialTags)
+export function TagInput({ tags, setTags, isEditing }: TagInputProps) {
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const { toast } = useToast()
-
-  useEffect(() => {
-    const fetchTags = async () => {
-      setIsLoading(true)
-      try {
-        const fetchedTags = await tagApi.getByEvent(eventId)
-        setTags(fetchedTags)
-        onTagsChange?.(fetchedTags)
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to fetch tags",
-        })
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchTags()
-  }, [eventId, onTagsChange, toast])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
   }
 
-  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleInputKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && inputValue) {
       e.preventDefault()
-      addTag(inputValue)
+      await addTag(inputValue)
     }
   }
 
-  const addTag = async (name: string) => {
-    if (name.trim() !== '' && !tags.some(tag => tag.name === name.trim())) {
-      setIsLoading(true)
-      try {
-        const newTag = await tagApi.create({ name: name.trim(), eventId } as CreateTagDto)
-        const updatedTags = [...tags, newTag]
-        setTags(updatedTags)
-        onTagsChange?.(updatedTags)
-        setInputValue('')
-        toast({
-          title: "Success",
-          description: "Tag added successfully",
-        })
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to add tag",
-        })
-      } finally {
-        setIsLoading(false)
-      }
-    }
-  }
-
-  const removeTag = async (tagToRemove: Tag) => {
-    setIsLoading(true)
+  const createTag = async (tagName: string) => {
     try {
-      await tagApi.delete(tagToRemove.id)
-      const updatedTags = tags.filter(tag => tag.id !== tagToRemove.id)
-      setTags(updatedTags)
-      onTagsChange?.(updatedTags)
-      toast({
-        title: "Success",
-        description: "Tag removed successfully",
-      })
+      await tagApi.create({ name: tagName, eventId: 'temp' }) // Replace 'temp' with actual eventId when available
+      return true
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to remove tag",
-      })
-    } finally {
+      console.error('Failed to create tag:', error)
+      return false
+    }
+  }
+
+  const addTag = async (tag: string) => {
+    if (tag.trim() !== '' && !tags.includes(tag.trim())) {
+      setIsLoading(true)
+      const success = await createTag(tag.trim())
+      if (success) {
+        setTags([...tags, tag.trim()])
+        setInputValue('')
+      }
       setIsLoading(false)
     }
+  }
+
+  const removeTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove))
   }
 
   return (
     <div>
       <div className="flex flex-wrap gap-2 mb-2">
         {tags.map(tag => (
-          <span key={tag.id} className="bg-primary text-primary-foreground px-2 py-1 rounded-full text-sm flex items-center">
-            {tag.name}
+          <span key={tag} className="bg-primary text-primary-foreground px-2 py-1 rounded-full text-sm flex items-center">
+            {tag}
             <button onClick={() => removeTag(tag)} className="ml-1 focus:outline-none" disabled={isLoading}>
               <X size={14} />
             </button>
