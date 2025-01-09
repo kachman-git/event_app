@@ -112,7 +112,14 @@ const handleUpdate = async (data: CreateEventDto | UpdateEventDto) => {
         </CardHeader>
         <CardContent>
           {isEditing ? (
-            <EventForm event={event} onSubmit={handleUpdate} />
+           <EventForm
+              event={{
+                  ...event,
+                  tags: event.tags?.map(tag => tag.name), 
+                }}
+                onSubmit={handleUpdate}
+/>
+
           ) : (
             <div className="space-y-4">
               <p><strong>Description:</strong> {event.description}</p>
