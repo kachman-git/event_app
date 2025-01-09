@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/custom-button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { CreateEventDto, UpdateEventDto, Tag } from '@/types'
+import { CreateEventDto, UpdateEventDto, Event, Tag } from '@/types'
 import { useToast } from "@/hooks/use-toast"
 import { TagInput } from './tag-input'
 
@@ -18,13 +18,13 @@ const eventSchema = z.object({
 })
 
 interface EventFormProps {
-  event?: CreateEventDto & { id?: string, tags?: Tag[] }
+  event?: Event
   onSubmit: (data: CreateEventDto | UpdateEventDto) => void
 }
 
 export function EventForm({ event, onSubmit }: EventFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [tags, setTags] = useState<string[]>(event?.tags?.map(tag => tag.name) || [])
+  const [tags, setTags] = useState<string[]>(event?.tags.map(tag => tag.name) || [])
   const { toast } = useToast()
 
   const ensureFullISOString = (dateString: string): string => {
@@ -49,7 +49,9 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
   const form = useForm<z.infer<typeof eventSchema>>({
     resolver: zodResolver(eventSchema),
     defaultValues: event ? {
-      ...event,
+      title: event.title,
+      description: event.description,
+      location: event.location,
       date: ensureFullISOString(event.date),
     } : {
       title: '',
@@ -70,13 +72,13 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
       await onSubmit(formattedData)
       toast({
         title: "Success",
-        description: event?.id ? "Event updated successfully" : "Event created successfully",
+        description: event ? "Event updated successfully" : "Event created successfully",
       })
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: event?.id ? "Failed to update event" : "Failed to create event",
+        description: event ? "Failed to update event" : "Failed to create event",
       })
     } finally {
       setIsSubmitting(false)
@@ -151,11 +153,11 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
           <TagInput 
             tags={tags}
             setTags={setTags}
-            isEditing={!!event?.id}
+            isEditing={!!event}
           />
         </FormItem>
         <Button type="submit" loading={isSubmitting}>
-          {event?.id ? 'Update Event' : 'Create Event'}
+          {event ? 'Update Event' : 'Create Event'}
         </Button>
       </form>
     </Form>
