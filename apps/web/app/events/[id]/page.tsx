@@ -1,82 +1,89 @@
-"use client";
+'use client'
 
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import { eventApi, rsvpApi } from "@/lib/api";
-import { Event, RSVP } from "@/types";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Loader2, Calendar, MapPin, Tag } from "lucide-react";
-import { format } from "date-fns";
-import { Countdown } from "@/components/countdown";
-import { toast } from "@/components/ui/use-toast";
+import { useState, useEffect } from 'react'
+import { useRouter, useParams } from 'next/navigation'
+import { Event } from '@/types'
+import { eventApi } from '@/lib/api'
+import { EventForm } from '@/components/event-form'
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Loader2, Edit, Trash2 } from 'lucide-react'
+import { BackButton } from '@/components/back-button'
+import { useToast } from "@/hooks/use-toast"
 
-export default function EventPage() {
-  const { id } = useParams();
-  const [event, setEvent] = useState<Event | null>(null);
-  const [rsvp, setRSVP] = useState<RSVP | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+function EventPage() {
+  const router = useRouter()
+  const { id } = useParams()
+  const [event, setEvent] = useState<Event | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [isEditing, setIsEditing] = useState(false)
+  const { toast } = useToast()
 
   useEffect(() => {
-    const fetchEventData = async () => {
+    const fetchEvent = async () => {
       try {
-        const eventData = await eventApi.getById(id as string);
-        setEvent(eventData);
-        const rsvpData = await rsvpApi.getByEvent(id as string);
-        setRSVP(rsvpData);
+        const fetchedEvent = await eventApi.getById(id as string)
+        setEvent(fetchedEvent)
       } catch (err) {
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Failed to fetch event data. Please try again.",
-        });
-        setError("Failed to fetch event data");
+          description: "Failed to fetch event details",
+        })
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchEventData();
-  }, [id, toast]);
+    fetchEvent()
+  }, [id, toast])
 
-  const handleRSVP = async (status: "GOING" | "MAYBE" | "NOT_GOING") => {
+  const handleUpdate = async (data) => {
     try {
-      const updatedRSVP = await rsvpApi.createOrUpdate({
-        eventId: id as string,
-        status,
-      });
-      setRSVP(updatedRSVP);
+      const updatedEvent = await eventApi.update(id as string, data)
+      setEvent(updatedEvent)
+      setIsEditing(false)
       toast({
         title: "Success",
-        description: "RSVP updated successfully",
-      });
-    } catch (err) {
+        description: "Event updated successfully",
+      })
+    } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update RSVP. Please try again.",
-      });
-      setError("Failed to update RSVP");
+        description: "Failed to update event",
+      })
     }
-  };
+  }
+
+  const handleDelete = async () => {
+    if (confirm('Are you sure you want to delete this event? This will also delete all associated tags.')) {
+      try {
+        await eventApi.delete(id as string)
+        toast({
+          title: "Success",
+          description: "Event and associated tags deleted successfully",
+        })
+        router.push('/events')
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to delete event and tags",
+        })
+      }
+    }
+  }
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
-    );
+    )
   }
 
-  if (error || !event) {
+  if (!event) {
     return (
       <div className="container mx-auto py-10">
         <Card className="max-w-2xl mx-auto">
@@ -84,58 +91,54 @@ export default function EventPage() {
             <CardTitle className="text-red-500">Error</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>{error || "Event not found"}</p>
+            <p>Event not found</p>
           </CardContent>
         </Card>
       </div>
-    );
+    )
   }
 
   return (
     <div className="container mx-auto py-10">
+      <BackButton />
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">{event.title}</CardTitle>
-          <CardDescription>{event.description}</CardDescription>
+          <CardTitle>{isEditing ? 'Edit Event' : event.title}</CardTitle>
+          <CardDescription>{isEditing ? 'Update the details of your event.' : `Event on ${new Date(event.date).toLocaleDateString()}`}</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <Countdown targetDate={new Date(event.date)} />
-          <div className="flex items-center space-x-2">
-            <Calendar className="h-5 w-5 text-gray-500" />
-            <span>{format(new Date(event.date), "PPP")}</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <MapPin className="h-5 w-5 text-gray-500" />
-            <span>{event.location}</span>
-          </div>
-          {event.tags && event.tags.length > 0 && (
-            <div className="flex items-center space-x-2">
-              <Tag className="h-5 w-5 text-gray-500" />
-              <span>{event.tags.map((tag) => tag.name).join(", ")}</span>
+        <CardContent>
+          {isEditing ? (
+            <EventForm event={event} onSubmit={handleUpdate} />
+          ) : (
+            <div className="space-y-4">
+              <p><strong>Description:</strong> {event.description}</p>
+              <p><strong>Location:</strong> {event.location}</p>
+              <p><strong>Date:</strong> {new Date(event.date).toLocaleString()}</p>
+              <div>
+                <strong>Tags:</strong>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {event.tags?.map(tag => (
+                    <span key={tag.id} className="bg-primary text-primary-foreground px-2 py-1 rounded-full text-sm">
+                      {tag.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="flex space-x-2 mt-4">
+                <Button onClick={() => setIsEditing(true)} className="flex items-center">
+                  <Edit className="mr-2 h-4 w-4" /> Edit Event
+                </Button>
+                <Button onClick={handleDelete} variant="destructive" className="flex items-center">
+                  <Trash2 className="mr-2 h-4 w-4" /> Delete Event
+                </Button>
+              </div>
             </div>
           )}
         </CardContent>
-        <CardFooter className="flex justify-center space-x-4">
-          <Button
-            onClick={() => handleRSVP("GOING")}
-            variant={rsvp?.status === "GOING" ? "default" : "outline"}
-          >
-            Going
-          </Button>
-          <Button
-            onClick={() => handleRSVP("MAYBE")}
-            variant={rsvp?.status === "MAYBE" ? "default" : "outline"}
-          >
-            Maybe
-          </Button>
-          <Button
-            onClick={() => handleRSVP("NOT_GOING")}
-            variant={rsvp?.status === "NOT_GOING" ? "default" : "outline"}
-          >
-            Not Going
-          </Button>
-        </CardFooter>
       </Card>
     </div>
-  );
+  )
 }
+
+export default EventPage
+
