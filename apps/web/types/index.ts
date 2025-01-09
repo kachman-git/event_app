@@ -3,11 +3,11 @@ export interface Event {
   title: string;
   description: string;
   location: string;
-  date: string;
+  date: string; // Full ISO-8601 datetime string
   organizerId: string;
   createdAt: string;
   updatedAt: string;
-  tags: Tag[];
+  tags: Tag[]; // Changed from optional to required
   rsvps?: RSVP[];
 }
 
@@ -38,23 +38,22 @@ export interface User {
   name: string;
   email: string;
   createdAt: string;
-  updatedAt: string;
 }
 
 export interface CreateEventDto {
   title: string;
   description: string;
   location: string;
-  date: string; 
-  tags: string[];
+  date: string; // Full ISO-8601 datetime string
+  tags: string[]; // Array of tag names
 }
 
 export interface UpdateEventDto {
   title?: string;
   description?: string;
   location?: string;
-  date?: string; 
-  tags?: string[];
+  date?: string; // Full ISO-8601 datetime string
+  tags?: string[]; // Array of tag names
 }
 
 export interface CreateProfileDto {
@@ -104,3 +103,4 @@ export interface RSVPSummary {
   status: "GOING" | "MAYBE" | "NOT_GOING";
   count: number;
 }
+
