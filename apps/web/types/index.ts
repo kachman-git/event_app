@@ -7,7 +7,7 @@ export interface Event {
   organizerId: string;
   createdAt: string;
   updatedAt: string;
-  tags?: Tag[];
+  tags: Tag[];
   rsvps?: RSVP[];
 }
 
