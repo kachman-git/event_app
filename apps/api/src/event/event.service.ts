@@ -1,25 +1,23 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEventDto, UpdateEventDto } from './dto';
+import { CreateTagsDto } from 'src/tags/dto';
 
 @Injectable()
 export class EventService {
   constructor(private prisma: PrismaService) {}
 
-getEventsAll() {
-  const events = this.prisma.event.findMany({
-    orderBy: {
-      createdAt: 'desc',
-    },
-    include: {
-      tags: true,
-      rsvps: true,
-    },
-  });
-  console.log('Fetched events:', events);
-  return events;
-}
-
+  getEventsAll() {
+    return this.prisma.event.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        tags: true,
+        rsvps: true,
+      },
+    });
+  }
 
   getEvents(organizerId: string) {
     return this.prisma.event.findMany({
@@ -40,6 +38,24 @@ getEventsAll() {
     });
   }
 
+  addTagToEvent(eventId: string, dto: CreateTagsDto) {
+    return this.prisma.tag.create({
+      data: {
+        ...dto,
+        eventId,
+      },
+    });
+  }
+
+  removeTagFromEvent(eventId: string, tagId: string) {
+    return this.prisma.tag.delete({
+      where: {
+        id: tagId,
+        eventId,
+      },
+    });
+  }
+
   async createEvent(organizerId: string, dto: CreateEventDto) {
     const event = await this.prisma.event.create({
       data: {
@@ -47,7 +63,6 @@ getEventsAll() {
         ...dto,
       },
     });
-
     return event;
   }
 
