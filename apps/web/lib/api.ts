@@ -104,7 +104,7 @@ export const tagApi = {
     }),
   update: (id: string, data: UpdateTagDto): Promise<Tag> =>
     fetchWithAuth(`/tags/${id}`, {
-      method: 'PUT',
+      method: 'PATCH',
       body: JSON.stringify(data),
     }),
   delete: (id: string): Promise<void> =>
@@ -127,5 +127,5 @@ export const rsvpApi = {
   getSummary: (eventId: string): Promise<RSVPSummary[]> => fetchWithAuth(`/rsvps/summary/${eventId}`),
 }
 
-export { tagApi }
+
 
