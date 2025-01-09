@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { Event } from '@/types'
+import { Event, CreateEventDto , UpdateEventDto  } from '@/types'
 import { eventApi } from '@/lib/api'
 import { EventForm } from '@/components/event-form'
 import { Button } from "@/components/ui/button"
