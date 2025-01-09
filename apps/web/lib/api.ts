@@ -1,13 +1,13 @@
 import { CreateEventDto, UpdateEventDto, Event, CreateTagDto, UpdateTagDto, Tag, AuthDto, AuthResponse, CreateProfileDto, UpdateProfileDto, Profile, EditUserDto, User, RSVPDto, RSVP, RSVPSummary } from '@/types'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL 
 
 async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
   const token = localStorage.getItem('token')
   const headers = {
     'Content-Type': 'application/json',
     ...options.headers,
-    Authorization:`Bearer ${token}`,
+    Authorization: token ? `Bearer ${token}` : '',
   }
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -67,12 +67,12 @@ export const profileApi = {
 
 // Event API
 export const eventApi = {
-  create: (data: CreateEventDto & { tags: string[] }): Promise<Event> =>
+  create: (data: CreateEventDto): Promise<Event> =>
     fetchWithAuth('/events', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
-  update: (id: string, data: UpdateEventDto & { tags: string[] }): Promise<Event> =>
+  update: (id: string, data: UpdateEventDto): Promise<Event> =>
     fetchWithAuth(`/events/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(data),
@@ -84,6 +84,15 @@ export const eventApi = {
   getAll: (): Promise<Event[]> => fetchWithAuth('/events'),
   getById: (id: string): Promise<Event> => fetchWithAuth(`/events/${id}`),
   getMyEvents: (): Promise<Event[]> => fetchWithAuth('/events/my-events'),
+  addTag: (eventId: string, tagName: string): Promise<Event> =>
+    fetchWithAuth(`/events/${eventId}/tags`, {
+      method: 'POST',
+      body: JSON.stringify({ name: tagName }),
+    }),
+  removeTag: (eventId: string, tagId: string): Promise<Event> =>
+    fetchWithAuth(`/events/${eventId}/tags/${tagId}`, {
+      method: 'DELETE',
+    }),
 }
 
 // Tag API
@@ -95,7 +104,7 @@ export const tagApi = {
     }),
   update: (id: string, data: UpdateTagDto): Promise<Tag> =>
     fetchWithAuth(`/tags/${id}`, {
-      method: 'PATCH',
+      method: 'PUT',
       body: JSON.stringify(data),
     }),
   delete: (id: string): Promise<void> =>
@@ -117,4 +126,6 @@ export const rsvpApi = {
   getUserRSVPs: (): Promise<RSVP[]> => fetchWithAuth('/rsvps/user'),
   getSummary: (eventId: string): Promise<RSVPSummary[]> => fetchWithAuth(`/rsvps/summary/${eventId}`),
 }
+
+export { tagApi }
 
