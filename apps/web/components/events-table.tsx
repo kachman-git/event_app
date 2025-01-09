@@ -83,7 +83,7 @@ export function EventsTable({ events }: EventsTableProps) {
                       } transition-colors hover:bg-gray-100 dark:hover:bg-gray-700`}
                     >
                       <TableCell className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        <Link href={`/events/${event.id}`} className="hover:underline">
+                        <Link href={`/events/${event.id}`} className="hover:underline text-blue-600 dark:text-blue-400">
                           {event.title}
                         </Link>
                       </TableCell>
