@@ -32,11 +32,10 @@ getEventsAll() {
     });
   }
 
-  getEventById(organizerId: string, eventId: string) {
+  getEventById(eventId: string) {
     return this.prisma.event.findFirst({
       where: {
         id: eventId,
-        organizerId,
       },
     });
   }
