@@ -9,9 +9,10 @@ interface TagInputProps {
   tags: string[]
   setTags: React.Dispatch<React.SetStateAction<string[]>>
   isEditing: boolean
+  eventId: string;
 }
 
-export function TagInput({ tags, setTags, isEditing }: TagInputProps) {
+export function TagInput({ tags, setTags, isEditing, eventId }: TagInputProps) {
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
@@ -28,7 +29,7 @@ export function TagInput({ tags, setTags, isEditing }: TagInputProps) {
 
   const createTag = async (tagName: string) => {
     try {
-      await tagApi.create({ name: tagName, eventId: 'temp' }) // Replace 'temp' with actual eventId when available
+      await tagApi.create({ name: tagName, eventId: eventId }) 
       return true
     } catch (error) {
       console.error('Failed to create tag:', error)
