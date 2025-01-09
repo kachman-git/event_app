@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation'
 import { useToast } from "@/hooks/use-toast"
 import { LoadingSpinner } from '@/components/loading-spinner'
 import Link from 'next/link'
+import { withProtectedRoute } from '@/components/protected-route'
 
 function EventsPage() {
   const router = useRouter()
@@ -69,12 +70,12 @@ function EventsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white shadow-xl rounded-lg overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg overflow-hidden">
           <div className="p-6 sm:p-8">
             <header className="flex flex-col sm:flex-row justify-between items-center mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4 sm:mb-0">Events</h1>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-0">Events</h1>
               <div className="flex items-center space-x-4">
                 <Link href="/my-events">
                   <Button variant="outline" className="flex items-center">
@@ -88,7 +89,7 @@ function EventsPage() {
               </div>
             </header>
             <div className="mb-6">
-              <Button onClick={sortEvents} variant="outline" className="flex items-center">
+              <Button onClick={sortEvents} variant="outline" className="flex items-center text-gray-700 dark:text-gray-300">
                 Sort by Date {sortOrder === 'asc' ? '(Ascending)' : '(Descending)'}
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
