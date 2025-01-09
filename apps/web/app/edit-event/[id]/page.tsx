@@ -38,23 +38,27 @@ function EventPage() {
     fetchEvent()
   }, [id, toast])
 
-  const handleUpdate = async (data: CreateEventDto | UpdateEventDto) => {
-    try {
-      const updatedEvent = await eventApi.update(id as string, data as UpdateEventDto)
-      setEvent(updatedEvent)
-      setIsEditing(false)
-      toast({
-        title: "Success",
-        description: "Event updated successfully",
-      })
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update event",
-      })
-    }
+const handleUpdate = async (data: CreateEventDto | UpdateEventDto) => {
+  try {
+    const updatedEvent = await eventApi.update(id as string, {
+      ...data,
+      tags: data.tags.map(tagName => ({ name: tagName })),
+    } as UpdateEventDto);
+    setEvent(updatedEvent);
+    setIsEditing(false);
+    toast({
+      title: "Success",
+      description: "Event updated successfully",
+    });
+  } catch (error) {
+    toast({
+      variant: "destructive",
+      title: "Error",
+      description: "Failed to update event",
+    });
   }
+};
+
 
   const handleDelete = async () => {
     if (confirm('Are you sure you want to delete this event? This will also delete all associated tags.')) {
