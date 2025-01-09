@@ -24,7 +24,7 @@ interface EventFormProps {
 
 export function EventForm({ event, onSubmit }: EventFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [tags, setTags] = useState<Tag[]>(event?.tags || [])
+  const [tags, setTags] = useState<string[]>(event?.tags?.map(tag => tag.name) || [])
   const { toast } = useToast()
 
   const ensureFullISOString = (dateString: string): string => {
@@ -65,7 +65,7 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
       const formattedData = {
         ...data,
         date: ensureFullISOString(data.date),
-        tags: tags.map(tag => tag.id),
+        tags: tags,
       }
       await onSubmit(formattedData)
       toast({
@@ -81,10 +81,6 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
     } finally {
       setIsSubmitting(false)
     }
-  }
-
-  const handleTagsChange = (newTags: Tag[]) => {
-    setTags(newTags)
   }
 
   return (
@@ -153,9 +149,9 @@ export function EventForm({ event, onSubmit }: EventFormProps) {
         <FormItem>
           <FormLabel>Tags</FormLabel>
           <TagInput 
-            eventId={event?.id || ''} 
-            initialTags={event?.tags} 
-            onTagsChange={handleTagsChange} 
+            tags={tags}
+            setTags={setTags}
+            isEditing={!!event?.id}
           />
         </FormItem>
         <Button type="submit" loading={isSubmitting}>
