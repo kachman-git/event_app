@@ -5,6 +5,7 @@ import { X } from 'lucide-react'
 import { Loader2 } from 'lucide-react'
 import { tagApi } from '@/lib/api'
 
+
 interface TagInputProps {
   tags: string[]
   setTags: React.Dispatch<React.SetStateAction<string[]>>
