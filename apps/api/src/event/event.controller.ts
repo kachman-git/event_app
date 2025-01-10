@@ -23,7 +23,7 @@ export class EventController {
 
   @Get('all')
   getEventsAll(@GetUser('id') organizerId: string) {
-    return this.eventService.getEvents(organizerId);
+    return this.eventService.getEventsAll(organizerId);
   }
 
   @Get('me')
