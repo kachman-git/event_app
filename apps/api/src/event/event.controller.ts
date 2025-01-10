@@ -15,7 +15,6 @@ import { EventService } from './event.service';
 import { JwtGuard } from 'src/auth/guard';
 import { GetUser } from 'src/auth/decorator';
 import { CreateEventDto, UpdateEventDto } from './dto';
-import { CreateTagsDto } from 'src/tags/dto';
 
 @UseGuards(JwtGuard)
 @Controller('events')
@@ -42,14 +41,6 @@ export class EventController {
     return this.eventService.createEvent(organizerId, dto);
   }
 
-  @Post(':id/tags')
-  addTagToEvent(
-    @Param('id', ParseUUIDPipe) eventId: string,
-    @Body() createTagDto: CreateTagsDto,
-  ) {
-    return this.eventService.addTagToEvent(eventId, createTagDto);
-  }
-
   @Patch(':id')
   editEventById(
     @GetUser('id') organizerId: string,
@@ -66,13 +57,5 @@ export class EventController {
     @Param('id', ParseUUIDPipe) eventId: string,
   ) {
     return this.eventService.deleteEventById(organizerId, eventId);
-  }
-
-  @Delete(':id/tags/:tagId')
-  removeTagFromEvent(
-    @Param('id', ParseUUIDPipe) eventId: string,
-    @Param('tagId', ParseUUIDPipe) tagId: string,
-  ) {
-    return this.eventService.removeTagFromEvent(eventId, tagId);
   }
 }
