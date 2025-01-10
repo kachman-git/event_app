@@ -1,7 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEventDto, UpdateEventDto } from './dto';
-import { CreateTagsDto } from 'src/tags/dto';
 
 @Injectable()
 export class EventService {
@@ -34,24 +33,6 @@ export class EventService {
     return this.prisma.event.findFirst({
       where: {
         id: eventId,
-      },
-    });
-  }
-
-  addTagToEvent(eventId: string, dto: CreateTagsDto) {
-    return this.prisma.tag.create({
-      data: {
-        ...dto,
-        eventId,
-      },
-    });
-  }
-
-  removeTagFromEvent(eventId: string, tagId: string) {
-    return this.prisma.tag.delete({
-      where: {
-        id: tagId,
-        eventId,
       },
     });
   }
